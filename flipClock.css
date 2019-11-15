@@ -1,0 +1,294 @@
+@digitWidth: 120px;
+@digitHeight: 180px;
+@halfHeight: @digitHeight * 0.5;
+@duration: 5s;
+@midPoint: 0.65; // used for timing z-index swaps; ease-in means that midpoint is later (slower at first)
+@restAngle: 10deg;
+@canvasBg: #e0e0e0;
+@digitBg: #ccc;
+@digitText: #444;
+
+.defineDigitKeyframes(@prefix, @flipFraction) {
+  @flipPct: 10 * @flipFraction;
+
+  .keyframeIter(@i) when (@i < 10) {
+    @kfParentName: ~'@{prefix}_flipParent@{i}';
+    @kfTopName: ~'@{prefix}_flipTop@{i}';
+    @kfBottomName: ~'@{prefix}_flipBottom@{i}';
+
+    @startPct: mod(@i * 10 + 100 - @flipPct, 100);
+    @midOnPct: mod(@i * 10 + 100 - @flipPct * (1 - @midPoint), 100);
+    @fullOnPct: @i * 10;
+    @fullOffPct: @i * 10 + 10 - @flipPct;
+    @midOffPct: @i * 10 + 10 - @flipPct * (1 - @midPoint);
+    @endPct: @i * 10 + 10;
+
+    @keyframes @kfParentName {
+      @startFrame: e('@{startPct}%');
+      @{startFrame} {
+        visibility: visible;
+        animation-timing-function: step-end;
+      }
+
+      @midOnFrame: e('@{midOnPct}%');
+      @{midOnFrame} {
+        visibility: visible;
+        z-index: 1;
+        animation-timing-function: step-end;
+      }
+
+      @fullOnFrame: e('@{fullOnPct}%');
+      @{fullOnFrame} {
+        visibility: visible;
+        animation-timing-function: step-end;
+      }
+
+      @fullOffFrame: e('@{fullOffPct}%');
+      @{fullOffFrame} {
+        visibility: visible;
+        z-index: 1;
+        animation-timing-function: step-end;
+      }
+
+      @midOffFrame: e('@{midOffPct}%');
+      @{midOffFrame} {
+        visibility: visible;
+        z-index: 0;
+        animation-timing-function: step-end;
+      }
+
+      @endFrame: e('@{endPct}%');    
+      @{endFrame} {
+        visibility: hidden;
+        animation-timing-function: step-end;
+      }
+    }
+
+    @keyframes @kfTopName {
+      @midPct: @endPct - 0.001;
+
+      @fullOffFrame: e('@{fullOffPct}%');    
+      @{fullOffFrame} {
+        transform: rotateX(0 - @restAngle);
+      }
+
+      @midFrame: e('@{midPct}%');    
+      @{midFrame} {
+        transform: rotateX(-180deg + @restAngle);
+      }
+
+      @endFrame: e('@{endPct}%');    
+      @{endFrame} {
+        transform: rotateX(0 - @restAngle);
+      }
+    }
+
+    @keyframes @kfBottomName {
+      @startFrame: e('@{startPct}%');    
+      @{startFrame} {
+        transform: translate3d(0px, @halfHeight, 0) rotateX(180deg - @restAngle);
+      }
+
+      @fullOnFrame: e('@{fullOnPct}%');    
+      @{fullOnFrame} {
+        transform: translate3d(0px, @halfHeight, 0) rotateX(@restAngle);
+      }
+
+      @endFrame: e('@{endPct}%');    
+      @{endFrame} {
+        transform: translate3d(0px, @halfHeight, 0) rotateX(@restAngle);
+      }
+    }
+
+    .keyframeIter(@i + 1);
+  }
+
+  .keyframeIter(0);
+}
+
+.defineDigitKeyframes('left', 0.05);
+.defineDigitKeyframes('right', 0.5);
+
+body {
+  background: #f0f0f0;
+}
+
+b {
+  @canvasWidth: @digitWidth * 5;
+  @canvasHeight: @digitHeight * 1.5;
+  
+  display: block;
+  margin-left: -@canvasWidth * 0.5;
+  margin-top: -@canvasHeight * 0.5;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: @canvasWidth;
+  height: @canvasHeight;
+  background: @canvasBg;
+  box-shadow: 2px -20px 100px -20px #888 inset;
+  overflow: hidden;
+
+  perspective: @digitHeight * 3;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
+    width: @canvasWidth * 0.9;
+    height: @canvasHeight * 0.3;
+    border-radius: 40%;
+    
+    background: transparent;
+
+    transform-style: preserve-3d;
+    z-index: 0;
+
+    box-shadow: 0px -@canvasHeight * 0.95 40px -10px #fff;
+    transform: translate3d(@canvasWidth * 0.05, @canvasHeight, 0);
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: @digitWidth * 2;
+    height: 10px;
+    border-radius: 50%;
+    
+    background: transparent;
+
+    transform-style: preserve-3d;
+    z-index: 0;
+
+    box-shadow: 0px -25px 20px -3px #000;
+    transform: translate3d(@canvasWidth * 0.5 - @digitWidth * 2 * 0.5, @canvasHeight, 0);
+  }
+  
+  i {
+    position: absolute;
+    top: 0;
+    left: 0;
+    font-family: Helvetica Neue, Arial, serif;
+    font-size: @digitHeight * 0.75;
+    font-style: normal;
+    font-weight: bold;
+
+    visibility: hidden;
+    animation-timing-function: step-end;
+    animation-iteration-count: infinite;
+
+    &.left {
+      transform: translate3d(@canvasWidth * 0.5 + @digitWidth * (-0.55 - 0.5), (@canvasHeight - @digitHeight) * 0.5, 0);
+    }
+    
+    &.right {
+      transform: translate3d(@canvasWidth * 0.5 + @digitWidth * (0.55 - 0.5), (@canvasHeight - @digitHeight) * 0.5, 0);
+    }
+    
+    transform-style: preserve-3d;
+    z-index: 0;
+        
+    &::before {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: @digitWidth;
+      height: @digitHeight * 0.5;
+      overflow: hidden;
+      line-height: @digitHeight + 2px;
+      background: @digitBg;
+      text-align: center;
+      color: @digitText;
+      
+      box-shadow: 0px 5px 60px -20px darken(@digitBg, 25%) inset, 0px -1px 3px -2px darken(@digitBg, 25%) inset;
+      
+      transform: rotateX(0 - @restAngle);
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+      transform-origin: 50% 100%;      
+
+      animation-timing-function: ease-in;
+      animation-iteration-count: infinite;
+      
+      border-radius: 10% 10% 0 0;
+    }
+    
+    &::after {
+      position: absolute;
+      top: 0;
+      left: 0;
+
+      width: @digitWidth;
+      height: @digitHeight * 0.5;
+      overflow: hidden;
+      line-height: 2px;
+      background: darken(@digitBg, 3%);
+      text-align: center;
+      color: darken(@digitText, 2%);
+
+      box-shadow: 0px -5px 60px -20px darken(@digitBg, 25%) inset, 0px 2px 3px -2px darken(@digitBg, 25%) inset;
+
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+      transform-origin: 50% 0%;
+      transform: translate3d(0px, @halfHeight, 0) rotateX(@restAngle);
+
+      animation-timing-function: ease-in;
+      animation-iteration-count: infinite;
+          
+      border-radius: 0 0 10% 10%;
+    }
+  }
+  
+  .iter(@i) when (@i < 10) {
+    @leftChild: @i + 1;
+    @rightChild: @i + 1 + 10;
+    
+    i:nth-child(@{leftChild}) {
+      animation-name: ~'left_flipParent@{i}';
+      animation-duration: @duration * 10;
+      
+      &::before {
+        content: '@{i}';
+        animation-name: ~'left_flipTop@{i}';
+        animation-duration: @duration * 10;
+      }
+      
+      &::after {
+        content: '@{i}';
+        animation-name: ~'left_flipBottom@{i}';
+        animation-duration: @duration * 10;
+      }
+    }
+    
+    i:nth-child(@{rightChild}) {
+      animation-name: ~'right_flipParent@{i}';
+      animation-duration: @duration;
+      
+      &::before {
+        content: '@{i}';
+        animation-name: ~'right_flipTop@{i}';
+        animation-duration: @duration;
+      }
+      
+      &::after {
+        content: '@{i}';
+        animation-name: ~'right_flipBottom@{i}';
+        animation-duration: @duration;
+      }
+    }
+    
+    .iter(@i + 1);
+  }
+  
+  /*b
+  - for x in (0 .. 9)
+    i.left
+  - for x in (0 .. 9)
+    i.right
+  .iter(0);*/
+}

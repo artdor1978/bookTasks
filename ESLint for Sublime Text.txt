@@ -1,0 +1,78 @@
+ESLint for Sublime Text
+
+Lint ECMAScript/JavaScript syntax by ESLint in Sublime Text 2 and 3.
+Prerequisites
+
+    Sublime Package Control
+    Node.js
+    eslint
+
+Installation
+Install Node.js and eslint
+
+Before using this plugin, you must ensure that eslint is installed on your system. To install eslint, do the following:
+
+    Install Node.js (and npm on Linux).
+
+    Install eslint globally by typing the following in a terminal:
+
+npm install -g eslint
+
+Install plugin
+
+Install this plugin by using Sublime Text Package Control.
+
+    Open “Command Pallet” Ctrl + Shift + p (Cmd + Shift + p on OSX)
+    Select “Package Control: Install Package”
+    Select ESLint
+
+Run ESLint
+
+ESLint an active JavaScript file.
+
+    Open the context menu (right-click), and Select ESLint,
+    Or Open “Command Pallet” and Select ESLint,
+    Or keyboard shortcut: Ctrl + Alt + e (Cmd + Option + e on OSX)
+
+    F4 : Jump to next error row/column
+
+    Shift + F4 : Jump to previous error row-column
+
+Note: The Ctrl + Alt + e (Cmd + Option + e on OSX) shortcut changes the Build System on the current file to ESLint, then Builds to run ESLint on the file and output any errors for jumping to within the file. You could alternatively set the Build System to Automatic and Ctrl + b (Cmd + b on OSX) or F7, but only on files that end with .js.
+Configuring ESLint
+
+ESLint allows you to specify the JavaScript language options you want to support by using .eslintrc file, it will use the first .eslintrc file found traversing from the active file in Sublime Text up to your project's root.
+
+You can configure ESLint options by specify .eslintrc file. For more information, see the ESLint docs.
+Settings
+
+Several settings are available to customize the plugin's behavior. Those settings are stored in a configuration file, as JSON.
+
+Go to “Preferences / Package Settings / ESLint / Settings - User” to add your custom settings.
+node_path
+
+Default: ""
+
+The directory location of your node executable lives. If this is not specified, then it is expected to be on Sublime's environment path.
+node_modules_path
+
+Default: ""
+
+The directory location of global node_modules via npm. If this is not specified, then it is expected to be on system environment variable NODE_PATH.
+config_file
+
+Default: ""
+
+This option allows you to specify an additional configuration file for ESLint. If not specified, follows the default config file hierarchy. This option works same as ESLint -c or --config command line option.
+
+For more information, see the ESLint docs.
+
+Example:
+
+{
+  "node_path": "/usr/local/bin",
+  "node_modules_path": "/usr/local/lib/node_modules",
+  "config_file": "/path/to/.eslintrc.js"
+}
+
+ESLint on save
